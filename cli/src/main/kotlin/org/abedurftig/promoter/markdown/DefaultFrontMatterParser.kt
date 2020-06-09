@@ -1,46 +1,52 @@
 package org.abedurftig.promoter.markdown
 
+import java.util.Scanner
+
 class DefaultFrontMatterParser(
     private val delimiter: String = "---"
 ) : FrontMatterParser {
 
-    override fun readFrontMatterAttributes(frontMatter: String): Map<String, Set<String>> {
+    override fun readFrontMatterAttributes(markdown: String): Map<String, Set<String>> {
 
         val result = mutableMapOf<String, Set<String>>()
-        val lines = frontMatter.split(System.lineSeparator())
-        if (lines.isNotEmpty() && lines.first() == delimiter) {
-            var currentKey = ""
-            var currentValues = mutableSetOf<String>()
-            for (line in lines.slice(IntRange(1, lines.size - 1))) {
-               if (isLineComplete(line)) {
-                   if (currentKey.isNotEmpty() && currentValues.isNotEmpty()) {
-                       result[currentKey] = currentValues
-                       currentKey = ""
-                       currentValues = mutableSetOf()
-                   }
-                   result[getKey(line)!!] = setOf(getValue(line)!!)
-               } else if (getKey(line) != null && getValue(line) == null) {
-                   currentKey = getKey(line)!!
-               } else if (!line.contains(delimiter) && line.trim().startsWith('-')) {
-                   val possibleValue = line.replace("-", "").trim()
-                   if (possibleValue.isNotBlank()) {
-                       currentValues.add(possibleValue)
-                   }
-               } else if (line.contains(delimiter)) {
-                   if (currentKey.isNotEmpty() && currentValues.isNotEmpty()) {
-                       result[currentKey] = currentValues
-                   }
-                   return result
-               } else {
-                   IllegalStateException("Cannot handle the current line: $line")
-               }
-            }
-        }
-        return result
-    }
 
-    private fun parseLines(lines: Set<String>): Pair<String, Set<String>> {
-        return "" to emptySet()
+        val scanner = Scanner(markdown)
+        var index = 0
+        var currentKey = ""
+        var currentValues = mutableSetOf<String>()
+        var keepParsing = true
+
+        while (scanner.hasNextLine() && keepParsing) {
+            val line = scanner.nextLine()
+            if (index == 0 && line == delimiter) {
+                continue
+            }
+            if (isLineComplete(line)) {
+                if (currentKey.isNotEmpty() && currentValues.isNotEmpty()) {
+                    result[currentKey] = currentValues
+                    currentKey = ""
+                    currentValues = mutableSetOf()
+                }
+                result[getKey(line)!!] = setOf(getValue(line)!!)
+            } else if (getKey(line) != null && getValue(line) == null) {
+                currentKey = getKey(line)!!
+            } else if (!line.contains(delimiter) && line.trim().startsWith('-')) {
+                val possibleValue = line.replace("-", "").trim()
+                if (possibleValue.isNotBlank()) {
+                    currentValues.add(possibleValue)
+                }
+            } else if (line.contains(delimiter)) {
+                if (currentKey.isNotEmpty() && currentValues.isNotEmpty()) {
+                    result[currentKey] = currentValues
+                }
+                keepParsing = false
+            } else {
+                throw IllegalStateException("Cannot handle the current line: $line")
+            }
+            index++
+        }
+        scanner.close()
+        return result
     }
 
     private fun isLineComplete(line: String): Boolean {
