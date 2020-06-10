@@ -4,7 +4,6 @@ import org.abedurftig.promoter.markdown.DefaultBodyParser
 import org.abedurftig.promoter.markdown.DefaultFrontMatterParser
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
-import java.lang.IllegalArgumentException
 
 class BlogPostReaderTests {
 

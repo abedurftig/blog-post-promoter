@@ -5,7 +5,6 @@ import org.abedurftig.promoter.markdown.FrontMatterParser
 import org.abedurftig.promoter.model.BlogPost
 import org.abedurftig.promoter.model.FrontMatterAttribute
 import java.io.File
-import java.lang.IllegalArgumentException
 import java.nio.file.Files
 import java.nio.file.Paths
 

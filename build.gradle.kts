@@ -38,6 +38,12 @@ subprojects {
     apply(plugin = "com.github.johnrengelman.shadow")
     apply(plugin = "jacoco")
 
+    ktlint {
+        version.set("0.36.0")
+        // See https://github.com/pinterest/ktlint/issues/527
+        disabledRules.set(setOf("import-ordering"))
+    }
+
     dependencies {
 
         implementation(platform("org.jetbrains.kotlin:kotlin-bom:$kotlinVersion"))
