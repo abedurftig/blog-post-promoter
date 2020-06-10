@@ -19,6 +19,11 @@ class DefaultFrontMatterParser(
         while (scanner.hasNextLine() && keepParsing) {
             val line = scanner.nextLine()
             if (index == 0 && line == delimiter) {
+                index++
+                continue
+            }
+            if (index == 0 && line != delimiter) {
+                keepParsing = false
                 continue
             }
             if (isLineComplete(line)) {
@@ -77,6 +82,5 @@ class DefaultFrontMatterParser(
             val possibleKey = line.substring(0, keyValueSeparatorIndex).trim()
             return if (possibleKey.isBlank()) null else possibleKey
         }
-
     }
 }
