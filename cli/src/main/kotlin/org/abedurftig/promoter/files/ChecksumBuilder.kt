@@ -8,7 +8,7 @@ import java.nio.file.Paths
 
 class ChecksumBuilder {
 
-    fun calculateCheckSum(filePath: String): String {
+    fun calculateCheckSumFromDist(filePath: String): String {
         return try {
             Files.newInputStream(Paths.get(filePath))
                 .use { inputStream -> DigestUtils.md5Hex(inputStream) }
@@ -17,5 +17,9 @@ class ChecksumBuilder {
         } catch (noSuchFile: NoSuchFileException) {
             ""
         }
+    }
+
+    fun calculateCheckSum(content: String): String {
+        return DigestUtils.md5Hex(content)
     }
 }

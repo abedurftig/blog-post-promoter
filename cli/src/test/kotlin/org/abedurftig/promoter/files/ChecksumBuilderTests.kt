@@ -11,7 +11,7 @@ class ChecksumBuilderTests {
     fun `should calculate correct checksum`() {
 
         val path = this.javaClass.getResource("/org/abedurftig/promoter/files/ChecksumBuilder/Markdown.md").toURI().path
-        val checksum = checksumBuilder.calculateCheckSum(path)
+        val checksum = checksumBuilder.calculateCheckSumFromDist(path)
 
         Assertions.assertThat(checksum).isEqualTo("fb2753a5bc382983310dea39fea7704a")
     }
@@ -19,7 +19,7 @@ class ChecksumBuilderTests {
     @Test
     fun `should handle non-existing path`() {
 
-        val checksum = checksumBuilder.calculateCheckSum("doesnnotexist/Markdown.md")
+        val checksum = checksumBuilder.calculateCheckSumFromDist("doesnnotexist/Markdown.md")
         Assertions.assertThat(checksum).isEmpty()
     }
 }
