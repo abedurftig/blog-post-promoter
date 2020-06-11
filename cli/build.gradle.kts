@@ -15,4 +15,5 @@ application {
 dependencies {
     implementation("commons-codec:commons-codec:1.14")
     implementation("com.github.ajalt:clikt:2.7.1")
+    implementation("com.google.code.gson:gson:2.8.6")
 }
