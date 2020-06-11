@@ -1,6 +1,8 @@
 package org.abedurftig.promoter.files
 
 import org.abedurftig.promoter.markdown.BodyParser
+import org.abedurftig.promoter.markdown.DefaultBodyParser
+import org.abedurftig.promoter.markdown.DefaultFrontMatterParser
 import org.abedurftig.promoter.markdown.FrontMatterParser
 import org.abedurftig.promoter.model.BlogPost
 import org.abedurftig.promoter.model.FrontMatterAttribute
@@ -9,8 +11,8 @@ import java.nio.file.Files
 import java.nio.file.Paths
 
 class BlogPostReader(
-    private val frontMatterParser: FrontMatterParser,
-    private val bodyParser: BodyParser
+    private val frontMatterParser: FrontMatterParser = DefaultFrontMatterParser(),
+    private val bodyParser: BodyParser = DefaultBodyParser()
 ) {
 
     fun readBlogPosts(folder: String): Set<BlogPost> {
