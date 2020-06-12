@@ -24,7 +24,7 @@ class BlogPostReaderTests {
     @Test
     fun `throws IllegalArgumentException when pointed to a file`() {
 
-        val pathToFile = this.javaClass.getResource("/org/abedurftig/promoter/files/BlogPostReader/SomeFile.txt").toURI().path
+        val pathToFile = this.javaClass.getResource("/org/abedurftig/promoter/files/BlogPostReader/Somefile.txt").toURI().path
         Assertions.assertThatThrownBy { blogPostReader.readBlogPosts(pathToFile) }
             .isInstanceOf(IllegalArgumentException::class.java)
             .hasMessage("Input path must be a directory.")
