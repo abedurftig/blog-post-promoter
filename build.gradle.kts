@@ -64,13 +64,13 @@ subprojects {
     tasks {
         compileKotlin {
             kotlinOptions {
-                jvmTarget = "1.8"
+                jvmTarget = "11"
                 javaParameters = true
             }
         }
         compileTestKotlin {
             kotlinOptions {
-                jvmTarget = "1.8"
+                jvmTarget = "11"
                 javaParameters = true
             }
         }

@@ -42,6 +42,7 @@ class ApplicationWrapper : CliktCommand(
         envvar = "GITHUB_TOKEN").required()
 
     override fun run() {
+        println("This will be great!")
     }
 }
 

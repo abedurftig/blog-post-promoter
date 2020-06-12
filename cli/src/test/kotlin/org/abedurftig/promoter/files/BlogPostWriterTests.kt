@@ -25,4 +25,3 @@ class BlogPostWriterTests {
         Assertions.assertThat(markdown).isEqualTo(TestData.sampleBlogPost)
     }
 }
-
