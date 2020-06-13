@@ -6,6 +6,7 @@ import org.abedurftig.promoter.files.StatusService
 import org.abedurftig.promoter.model.BlogPost
 import org.abedurftig.promoter.model.PromoterStatus
 import org.abedurftig.promoter.model.StatusEntry
+import org.eclipse.jgit.api.Git
 import java.io.File
 
 class Promoter(
@@ -35,6 +36,14 @@ class Promoter(
         }
         val updatedStatus = PromoterStatus(statusMap)
         statusService.writeStatus(updatedStatus)
+
+//        val git = Git.open(File(settings.targetDir + File.separator + ".git"))
+//        Log.log("Found Git repo:" + git.repository.identifier)
+//        val gitStatus = git.status().call()
+//        gitStatus.untracked.forEach { Log.log(it) }
+//        gitStatus.modified.forEach { Log.log(it) }
+//        git.add().addFilepattern().call()
+//        git.close()
     }
 
     private fun handleSingePost(blogPost: BlogPost, settings: Settings, status: PromoterStatus): StatusEntry? {
