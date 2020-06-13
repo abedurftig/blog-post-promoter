@@ -11,7 +11,11 @@ import java.time.format.DateTimeFormatter
 
 object JsonMapperFactory {
 
-    fun getMapper(): Gson {
+    private var gson = getMapper()
+
+    fun getGson() = gson
+
+    private fun getMapper(): Gson {
         return GsonBuilder()
             .setPrettyPrinting()
             .setDateFormat(DateFormat.FULL, DateFormat.FULL)

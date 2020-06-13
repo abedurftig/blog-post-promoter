@@ -14,7 +14,8 @@ class BlogPostWriterTests {
     fun `should write out blog post to markdown file`() {
 
         val filePath = "/org/abedurftig/promoter/files/BlogPostWriter/MyFirstPost.md"
-        val blogPost = BlogPost(TestData.sampleBody, TestData.sampleFrontMatter, filePath)
+        val absolutePath = Paths.get(this.javaClass.getResource(filePath).toURI()).toFile().absolutePath
+        val blogPost = BlogPost(TestData.sampleBody, TestData.sampleFrontMatter, absolutePath)
 
         // act
         val blogPostWriter = BlogPostWriter(MarkdownComposer())

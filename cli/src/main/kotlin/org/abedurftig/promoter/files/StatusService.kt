@@ -4,7 +4,10 @@ import org.abedurftig.promoter.flow.Settings
 import org.abedurftig.promoter.model.PromoterStatus
 import java.io.File
 
-class StatusService private constructor(private val statusReader: StatusReader, private val statusWriter: StatusWriter) {
+class StatusService private constructor(
+    private val statusReader: StatusReader,
+    private val statusWriter: StatusWriter
+) {
 
     companion object {
         private const val FILE_NAME = "promoter.status"

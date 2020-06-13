@@ -6,9 +6,7 @@ import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.required
 import org.abedurftig.promoter.files.BlogPostReader
 import org.abedurftig.promoter.files.ChecksumBuilder
-import org.abedurftig.promoter.files.StatusReader
 import org.abedurftig.promoter.files.StatusService
-import org.abedurftig.promoter.files.StatusWriter
 import org.abedurftig.promoter.flow.Promoter
 import org.abedurftig.promoter.flow.Settings
 import org.slf4j.LoggerFactory
@@ -46,7 +44,8 @@ class ApplicationWrapper : CliktCommand(
 
     private val publishIf: String by option(
         "--publish-if", "-if",
-        help = "The name of front matter attribute which needs to be true before publishing the post; for example 'public'",
+        help = "The name of front matter attribute which needs to be " +
+            "true before publishing the post; for example 'public'",
         envvar = "ARTICLES_DIR").required()
 
     private val devToken: String by option(
