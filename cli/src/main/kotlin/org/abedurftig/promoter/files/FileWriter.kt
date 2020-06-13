@@ -7,7 +7,7 @@ object FileWriter {
 
     fun writeToFile(filePath: String, content: String) {
         Files.writeString(
-            Paths.get(this.javaClass.getResource(filePath).toURI()),
+            Paths.get(filePath),
             content
         )
     }

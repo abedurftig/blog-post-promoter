@@ -50,6 +50,9 @@ subprojects {
         implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
         implementation("org.jetbrains.kotlin:kotlin-reflect")
 
+        implementation("org.slf4j:slf4j-api:1.7.30")
+        implementation("org.slf4j:slf4j-log4j12:1.7.30")
+
         testImplementation("org.jetbrains.kotlin:kotlin-test")
         testImplementation("org.jetbrains.kotlin:kotlin-test-junit")
         testImplementation("org.junit.jupiter:junit-jupiter-api:$jupiterVersion")

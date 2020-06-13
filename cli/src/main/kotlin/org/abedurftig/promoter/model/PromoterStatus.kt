@@ -9,5 +9,5 @@ data class PromoterStatus(
 
 data class StatusEntry(
     val checkSum: String,
-    val lastUpdate: LocalDateTime
+    val lastUpdate: LocalDateTime = LocalDateTime.now()
 )

@@ -1,13 +1,11 @@
 package org.abedurftig.promoter.files
 
-import com.google.gson.Gson
+import org.abedurftig.promoter.model.JsonMapperFactory
 import org.abedurftig.promoter.model.PromoterStatus
 
-class StatusWriter(private val filePath: String) {
-
-    private val jsonMapper = Gson()
+class StatusWriter(private val contentPath: String, private val fileName: String) {
 
     fun writeOutStatus(promoterStatus: PromoterStatus) {
-        FileWriter.writeToFile(filePath, jsonMapper.toJson(promoterStatus))
+        FileWriter.writeToFile(contentPath + fileName, JsonMapperFactory.getMapper().toJson(promoterStatus))
     }
 }
