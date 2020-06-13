@@ -28,31 +28,40 @@ class Promoter(
 
         blogPosts.forEach { blogPost ->
             val fileName = blogPost.filePath.substringAfterLast(File.separator)
-            val postStatus = status.postStatusMap[fileName]
-            val newChecksum = checksumBuilder.calculateCheckSumFromDist(blogPost.filePath)
-            when {
-                postStatus == null -> {
-                    val shouldBePublished = shouldBePublished(blogPost, settings.publishIf)
-                    Log.log("Found new post in file '$fileName' and should be published: '$shouldBePublished'.")
-                    if (shouldBePublished) {
-                        statusMap[fileName] = StatusEntry(newChecksum)
-                    }
-                }
-                newChecksum == postStatus.checkSum -> {
-                    Log.log("Post in file '$fileName' has not changed.")
-                    statusMap[fileName] = StatusEntry(postStatus.checkSum, postStatus.lastUpdate)
-                }
-                else -> {
-                    val shouldBePublished = shouldBePublished(blogPost, settings.publishIf)
-                    Log.log("Post in file '$fileName' has been updated and should be published: '$shouldBePublished'.")
-                    if (shouldBePublished) {
-                        statusMap[fileName] = StatusEntry(newChecksum)
-                    }
-                }
+            val postStatus = handleSingePost(blogPost, settings, status)
+            postStatus?.let {
+                statusMap[fileName] = it
             }
         }
         val updatedStatus = PromoterStatus(statusMap)
         statusService.writeStatus(updatedStatus)
+    }
+
+    private fun handleSingePost(blogPost: BlogPost, settings: Settings, status: PromoterStatus): StatusEntry? {
+        val fileName = blogPost.filePath.substringAfterLast(File.separator)
+        val postStatus = status.postStatusMap[fileName]
+        val newChecksum = checksumBuilder.calculateCheckSumFromDist(blogPost.filePath)
+        when {
+            postStatus == null -> {
+                val shouldBePublished = shouldBePublished(blogPost, settings.publishIf)
+                Log.log("Found new post in file '$fileName' and should be published: '$shouldBePublished'.")
+                if (shouldBePublished) {
+                    return StatusEntry(newChecksum)
+                }
+            }
+            newChecksum == postStatus.checkSum -> {
+                Log.log("Post in file '$fileName' has not changed.")
+                return StatusEntry(postStatus.checkSum, postStatus.lastUpdate)
+            }
+            else -> {
+                val shouldBePublished = shouldBePublished(blogPost, settings.publishIf)
+                Log.log("Post in file '$fileName' has been updated and should be published: '$shouldBePublished'.")
+                if (shouldBePublished) {
+                    return StatusEntry(newChecksum)
+                }
+            }
+        }
+        return null
     }
 
     private fun shouldBePublished(blogPost: BlogPost, publishIf: String): Boolean {
