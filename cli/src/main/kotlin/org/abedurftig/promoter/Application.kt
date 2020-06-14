@@ -26,10 +26,6 @@ class ApplicationWrapper : CliktCommand(
     epilog = "Feel free to contribute or report any issues at https://github.com/abedurftig/blog-post-promoter/."
 ) {
 
-    companion object {
-        private val LOG = LoggerFactory.getLogger("BlogPostPromoter")
-    }
-
     init {
         context {
             autoEnvvarPrefix = "BPP"

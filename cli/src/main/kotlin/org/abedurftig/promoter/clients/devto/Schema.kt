@@ -4,6 +4,10 @@ data class CreateArticleRequest(val article: Article)
 
 data class CreateArticleResponse(val id: Int, val url: String)
 
+data class UpdateArticleRequest(val article: Article)
+
+data class UpdateArticleResponse(val id: Int, val url: String)
+
 data class Article(
     val title: String,
     val bodyMarkdown: String

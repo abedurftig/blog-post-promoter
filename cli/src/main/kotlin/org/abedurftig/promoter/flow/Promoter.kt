@@ -78,11 +78,13 @@ class Promoter(
 
     private fun handleNewPost(toBePublished: BlogPost): Pair<String, StatusEntry> {
         val publishedPost = publishBlogPost(toBePublished)
+        Log.log("Published blog post '${publishedPost.title}' on Dev.to.")
         return handleModification(publishedPost)
     }
 
     private fun handleUpdatedPost(toBeUpdated: BlogPost): Pair<String, StatusEntry> {
         val updatedPost = updateBlogPost(toBeUpdated)
+        Log.log("Updated blog post '${updatedPost.title}' on Dev.to.")
         return handleModification(updatedPost)
     }
 
@@ -137,11 +139,16 @@ class Promoter(
     }
 
     private fun updateBlogPost(blogPost: BlogPost): BlogPost {
+        devToService.updateArticle(getDevToId(blogPost), blogPost.title, markdownComposer.composeMarkdown(blogPost))
         return blogPost
     }
 
     private fun getFileName(blogPost: BlogPost): String {
         return blogPost.filePath.substringAfterLast(File.separator)
+    }
+
+    private fun getDevToId(blogPost: BlogPost): Int {
+        return blogPost.attributes.first { it.key == "devToId" }.values.first().toInt()
     }
 
     private fun shouldBePublished(blogPost: BlogPost, publishIf: String): Boolean {
