@@ -11,7 +11,7 @@ class MarkdownComposerTests {
     fun `should create well formatted markdown content`() {
 
         val filePath = "/org/abedurftig/promoter/files/BlogPostWriter/MyFirstPost.md"
-        val blogPost = BlogPost(TestData.sampleBody, TestData.sampleFrontMatter, filePath)
+        val blogPost = BlogPost(TestData.sampleTitle, TestData.sampleBody, TestData.sampleFrontMatter, filePath)
 
         // act
         val markdown = MarkdownComposer().composeMarkdown(blogPost)

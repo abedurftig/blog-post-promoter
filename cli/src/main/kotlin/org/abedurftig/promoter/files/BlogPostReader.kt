@@ -14,7 +14,6 @@ class BlogPostReader(
     private val frontMatterParser: FrontMatterParser = DefaultFrontMatterParser(),
     private val bodyParser: BodyParser = DefaultBodyParser()
 ) {
-
     fun readBlogPosts(folder: String): Set<BlogPost> {
         val folderFile = Paths.get(folder).toFile()
         runBasicValidation(folderFile)
@@ -41,7 +40,13 @@ class BlogPostReader(
         val markdown = String(Files.readAllBytes(blogPostFile.toPath()))
         val frontMatter = frontMatterParser.readFrontMatterAttributes(markdown)
         val frontMatterAttributes = frontMatter.map { entry -> FrontMatterAttribute(entry.key, entry.value) }.toSet()
+        val title = getTitle(blogPostFile, frontMatterAttributes)
         val body = bodyParser.extractBody(markdown)
-        return BlogPost(body, frontMatterAttributes, blogPostFile.path)
+        return BlogPost(title, body, frontMatterAttributes, blogPostFile.path)
+    }
+
+    private fun getTitle(blogPostFile: File, frontMatterAttributes: Set<FrontMatterAttribute>): String {
+        val frontMatterTitle = frontMatterAttributes.firstOrNull { it.key == "title" }?.values?.first()
+        return frontMatterTitle ?: blogPostFile.name
     }
 }

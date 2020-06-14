@@ -15,7 +15,7 @@ class BlogPostWriterTests {
 
         val filePath = "/org/abedurftig/promoter/files/BlogPostWriter/MyFirstPost.md"
         val absolutePath = Paths.get(this.javaClass.getResource(filePath).toURI()).toFile().absolutePath
-        val blogPost = BlogPost(TestData.sampleBody, TestData.sampleFrontMatter, absolutePath)
+        val blogPost = BlogPost(TestData.sampleTitle, TestData.sampleBody, TestData.sampleFrontMatter, absolutePath)
 
         // act
         val blogPostWriter = BlogPostWriter(MarkdownComposer())

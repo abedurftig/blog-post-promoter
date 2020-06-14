@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "POST",
+    "url": "/api/articles"
+  },
+  "response": {
+    "status": 201,
+    "bodyFileName" : "mock-responses/dev.to-create-article-201.json",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

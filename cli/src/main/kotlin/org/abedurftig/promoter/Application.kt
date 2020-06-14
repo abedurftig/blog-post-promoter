@@ -4,11 +4,15 @@ import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.context
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.required
+import org.abedurftig.promoter.clients.devto.DevToClient
+import org.abedurftig.promoter.clients.devto.DevToService
 import org.abedurftig.promoter.files.BlogPostReader
+import org.abedurftig.promoter.files.BlogPostWriter
 import org.abedurftig.promoter.files.ChecksumBuilder
 import org.abedurftig.promoter.files.StatusService
 import org.abedurftig.promoter.flow.Promoter
 import org.abedurftig.promoter.flow.Settings
+import org.abedurftig.promoter.markdown.MarkdownComposer
 import org.slf4j.LoggerFactory
 
 class ApplicationWrapper : CliktCommand(
@@ -62,9 +66,13 @@ class ApplicationWrapper : CliktCommand(
 
         val settings = Settings(projectDir, articlesDir, githubToken, devToken, publishIf)
         val blogPostReader = BlogPostReader()
+        val markdownComposer = MarkdownComposer()
+        val blogPostWriter = BlogPostWriter(markdownComposer)
         val statusService = StatusService(settings)
         val checksumBuilder = ChecksumBuilder()
-        Promoter(blogPostReader, statusService, checksumBuilder).execute(settings)
+        val devToService = DevToService(DevToClient(settings.devToken))
+
+        Promoter(blogPostReader, blogPostWriter, statusService, checksumBuilder, devToService, markdownComposer).execute(settings)
     }
 }
 

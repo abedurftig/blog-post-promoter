@@ -9,7 +9,6 @@ data class Settings(
 ) {
     override fun toString(): String {
         return """
-            Settings:
             ------------------
             project directory: $targetDir
             content directory: $contentDir

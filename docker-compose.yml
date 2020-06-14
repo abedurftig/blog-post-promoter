@@ -1,0 +1,9 @@
+version: "3"
+services:
+  wiremock:
+    image: rodolpheche/wiremock
+    command: --port 9999 --verbose
+    ports:
+      - "9999:9999"
+    volumes:
+      - ./wiremock:/home/wiremock

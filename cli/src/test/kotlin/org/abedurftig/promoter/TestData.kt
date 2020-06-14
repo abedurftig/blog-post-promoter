@@ -4,9 +4,11 @@ import org.abedurftig.promoter.model.FrontMatterAttribute
 
 object TestData {
 
+    const val sampleTitle = "This is the title of my first post"
+
     val sampleBlogPost = """
         ---
-        title: This is the title of my first post
+        title: $sampleTitle
         description: This is the desc of my first post
         tags:
           - Development
