@@ -5,6 +5,7 @@ buildscript {
     }
     dependencies {
         classpath(Plugins.kotlinGradlePlugin)
+        classpath(Plugins.dockerComposePlugin)
     }
 }
 
@@ -37,6 +38,7 @@ subprojects {
     apply(plugin = "org.jlleitschuh.gradle.ktlint")
     apply(plugin = "com.github.johnrengelman.shadow")
     apply(plugin = "jacoco")
+    apply(plugin = "docker-compose")
 
     ktlint {
         version.set("0.36.0")
@@ -65,21 +67,21 @@ subprojects {
     }
 
     tasks {
+
         compileKotlin {
             kotlinOptions {
                 jvmTarget = "11"
                 javaParameters = true
             }
         }
+
         compileTestKotlin {
             kotlinOptions {
                 jvmTarget = "11"
                 javaParameters = true
             }
         }
-        test {
-            useJUnitPlatform()
-        }
+
         jacocoTestReport {
             reports {
                 xml.isEnabled = false
@@ -88,11 +90,33 @@ subprojects {
                 html.destination = file("$buildDir/reports/coverage")
             }
         }
+
         shadowJar {
             mergeServiceFiles()
         }
-        check {
-            dependsOn("jacocoTestReport")
+
+        test {
+            exclude("**/*Integration*")
         }
+
+        task<Test>("integrationTest") {
+            description = "Runs integration tests."
+            group = "verification"
+            testClassesDirs = sourceSets.test.get().output.classesDirs
+            classpath = sourceSets.test.get().runtimeClasspath
+
+            include("**/*Integration*")
+            shouldRunAfter("test")
+            dependsOn("composeUp")
+            finalizedBy("composeDown")
+        }
+
+        check {
+            dependsOn("integrationTest", "jacocoTestReport")
+        }
+    }
+
+    tasks.withType(Test::class.java) {
+        useJUnitPlatform()
     }
 }
