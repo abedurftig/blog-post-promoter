@@ -14,7 +14,7 @@ interface DevToApi {
     fun updateArticle(id: Int, updateArticleRequest: UpdateArticleRequest): UpdateArticleResponse
 }
 
-class ClientException(message: String, private val status: Int) : Exception(message) {
+class ClientException(message: String, private val status: Int) : Exception("$message (status: $status)") {
 
     override fun toString(): String {
         return "$message (status: $status)"

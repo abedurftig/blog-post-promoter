@@ -11,6 +11,7 @@ import org.abedurftig.promoter.files.BlogPostReader
 import org.abedurftig.promoter.files.BlogPostWriter
 import org.abedurftig.promoter.files.ChecksumBuilder
 import org.abedurftig.promoter.files.StatusService
+import org.abedurftig.promoter.flow.GitClient
 import org.abedurftig.promoter.flow.Promoter
 import org.abedurftig.promoter.flow.Settings
 import org.abedurftig.promoter.markdown.MarkdownComposer
@@ -67,8 +68,17 @@ class ApplicationWrapper : CliktCommand(
         val statusService = StatusService(settings)
         val checksumBuilder = ChecksumBuilder()
         val devToService = DevToService(DevToClient(settings.devToken))
+        val gitClient = GitClient(settings.githubToken)
 
-        Promoter(blogPostReader, blogPostWriter, statusService, checksumBuilder, devToService, markdownComposer).execute(settings)
+        Promoter(
+            blogPostReader,
+            blogPostWriter,
+            statusService,
+            checksumBuilder,
+            devToService,
+            markdownComposer,
+            gitClient
+        ).execute(settings)
     }
 }
 

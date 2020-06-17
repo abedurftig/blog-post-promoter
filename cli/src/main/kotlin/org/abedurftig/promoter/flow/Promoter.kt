@@ -1,5 +1,6 @@
 package org.abedurftig.promoter.flow
 
+import io.vavr.control.Try
 import org.abedurftig.promoter.clients.devto.DevToService
 import org.abedurftig.promoter.files.BlogPostReader
 import org.abedurftig.promoter.files.BlogPostWriter
@@ -31,7 +32,8 @@ class Promoter(
     private val statusService: StatusService,
     private val checksumBuilder: ChecksumBuilder,
     private val devToService: DevToService,
-    private val markdownComposer: MarkdownComposer
+    private val markdownComposer: MarkdownComposer,
+    private val gitClient: GitClient
 ) {
 
     fun execute(settings: Settings) {
@@ -42,12 +44,24 @@ class Promoter(
         val contentPath = settings.targetDir + settings.contentDir
         val blogPosts = blogPostReader.readBlogPosts(contentPath)
         val status = statusService.readStatus()
-        val statusMap = mutableMapOf<String, StatusEntry>()
 
         Log.log("Found ${blogPosts.size} blog posts, the last status update was '${status.lastUpdate}'.")
 
         val context = buildContext(blogPosts, status, settings)
         Log.log(context.toString())
+
+        val statusMap = run(context, status)
+        val updatedStatus = PromoterStatus(statusMap)
+
+        statusService.writeStatus(updatedStatus)
+
+        val gitRepoPath = settings.targetDir + File.separator + ".git"
+        gitClient.commitNewAndChangedFiles(gitRepoPath)
+    }
+
+    private fun run(context: Context, status: PromoterStatus): Map<String, StatusEntry> {
+
+        val statusMap = mutableMapOf<String, StatusEntry>()
 
         context.toBePublished.forEach { toBePublished ->
             val statusMapEntryPair = handleNewPost(toBePublished)
@@ -62,30 +76,38 @@ class Promoter(
         context.unmodified.forEach { unmodified ->
             val fileName = unmodified.filePath.substringAfterLast(File.separator)
             statusMap[fileName] = status.postStatusMap[getFileName(unmodified)] ?: error("")
+            Log.log("The blog post with title '${unmodified.title}' has not changed.")
         }
 
-        val updatedStatus = PromoterStatus(statusMap)
-        statusService.writeStatus(updatedStatus)
+        context.untracked.forEach { untracked ->
+            Log.log("The blog post with title '${untracked.title}' is not tracked yet.")
+        }
 
-//        val git = Git.open(File(settings.targetDir + File.separator + ".git"))
-//        Log.log("Found Git repo:" + git.repository.identifier)
-//        val gitStatus = git.status().call()
-//        gitStatus.untracked.forEach { Log.log(it) }
-//        gitStatus.modified.forEach { Log.log(it) }
-//        git.add().addFilepattern().call()
-//        git.close()
+        return statusMap
     }
 
     private fun handleNewPost(toBePublished: BlogPost): Pair<String, StatusEntry> {
-        val publishedPost = publishBlogPost(toBePublished)
-        Log.log("Published blog post '${publishedPost.title}' on Dev.to.")
-        return handleModification(publishedPost)
+        val publishingAttempt = publishBlogPost(toBePublished)
+        return if (publishingAttempt.isFailure) {
+            Log.log("Publishing of blog post '${toBePublished.title}' to Dev.to failed.")
+            handleModification(toBePublished)
+        } else {
+            val publishedPost = publishingAttempt.get()
+            Log.log("Published blog post '${publishedPost.title}' on Dev.to.")
+            handleModification(publishedPost)
+        }
     }
 
     private fun handleUpdatedPost(toBeUpdated: BlogPost): Pair<String, StatusEntry> {
-        val updatedPost = updateBlogPost(toBeUpdated)
-        Log.log("Updated blog post '${updatedPost.title}' on Dev.to.")
-        return handleModification(updatedPost)
+        val updateAttempt = updateBlogPost(toBeUpdated)
+        return if (updateAttempt.isFailure) {
+            Log.log("Updating blog post '${toBeUpdated.title}' on Dev.to failed.")
+            handleModification(toBeUpdated)
+        } else {
+            val updatedPost = updateAttempt.get()
+            Log.log("Updated blog post '${updatedPost.title}' on Dev.to.")
+            handleModification(updatedPost)
+        }
     }
 
     private fun handleModification(modifiedBlogPost: BlogPost): Pair<String, StatusEntry> {
@@ -124,23 +146,26 @@ class Promoter(
                 }
             }
         }
-
         return Context(toBePublished, toBeUpdated, unmodified, untracked)
     }
 
-    private fun publishBlogPost(blogPost: BlogPost): BlogPost {
-        val response = devToService.createArticle(blogPost.title, markdownComposer.composeMarkdown(blogPost))
-        val newFrontMatter = mutableSetOf(
-            FrontMatterAttribute("devToId", setOf(response.id.toString())),
-            FrontMatterAttribute("devToUrl", setOf(response.url)),
-            *blogPost.attributes.toTypedArray()
-        )
-        return blogPost.copy(attributes = newFrontMatter)
+    private fun publishBlogPost(blogPost: BlogPost): Try<BlogPost> {
+        return Try.of {
+            val response = devToService.createArticle(blogPost.title, markdownComposer.composeMarkdown(blogPost))
+            val newFrontMatter = mutableSetOf(
+                FrontMatterAttribute("devToId", setOf(response.id.toString())),
+                FrontMatterAttribute("devToUrl", setOf(response.url)),
+                *blogPost.attributes.toTypedArray()
+            )
+            blogPost.copy(attributes = newFrontMatter)
+        }
     }
 
-    private fun updateBlogPost(blogPost: BlogPost): BlogPost {
-        devToService.updateArticle(getDevToId(blogPost), blogPost.title, markdownComposer.composeMarkdown(blogPost))
-        return blogPost
+    private fun updateBlogPost(blogPost: BlogPost): Try<BlogPost> {
+        return Try.of {
+            devToService.updateArticle(getDevToId(blogPost), blogPost.title, markdownComposer.composeMarkdown(blogPost))
+            blogPost
+        }
     }
 
     private fun getFileName(blogPost: BlogPost): String {
