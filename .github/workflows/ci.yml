@@ -29,6 +29,12 @@ jobs:
         run: |
           ./gradlew check assemble
 
+      - name: Archive cli module test reports
+          uses: actions/upload-artifact@v1
+          with:
+            name: test-reports
+            path: /home/runner/work/blog-post-promoter/blog-post-promoter/cli/build/reports/tests
+
       - name: Publish Docker
         uses: docker/build-push-action@v1
         with:
