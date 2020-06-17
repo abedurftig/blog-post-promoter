@@ -53,7 +53,7 @@ class Promoter(
         Log.log("Found ${blogPosts.size} blog posts, the last status update was '${status.lastUpdate}'.")
 
         val context = buildContext(blogPosts, status, settings)
-        Log.log("More detail: ${context.toString()}")
+        Log.log("More detail: $context")
 
         val statusMap = processBlogPosts(context, status)
         val updatedStatus = PromoterStatus(statusMap)
