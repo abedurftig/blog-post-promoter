@@ -1,12 +1,5 @@
-FROM oracle/graalvm-ce:20.0.0-java11 as graalvm
-RUN gu install native-image
+FROM adoptopenjdk/openjdk11:jdk-11.0.7_10-alpine-slim
 
-COPY . /home/app/blog-post-promoter
-WORKDIR /home/app/blog-post-promoter
-
-RUN native-image --no-server --no-fallback -cp ./cli/build/libs/cli-0.0.1-all.jar -H:Name=blog-post-promoter -H:Class=org.abedurftig.promoter.Application
-
-FROM frolvlad/alpine-glibc
-RUN apk update && apk add libstdc++
-COPY --from=graalvm /home/app/blog-post-promoter/blog-post-promoter /blog-post-promoter/blog-post-promoter
-ENTRYPOINT ["/blog-post-promoter/blog-post-promoter"]
+WORKDIR .
+ADD ./cli/build/libs/cli-0.0.1-all.jar app.jar
+CMD java -jar app.jar
