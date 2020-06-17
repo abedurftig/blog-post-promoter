@@ -1,0 +1,16 @@
+{
+  "request": {
+    "method": "POST",
+    "url": "/api/articles",
+    "headers": {
+      "api_key": {
+        "equalTo": "wrong_key",
+        "caseInsensitive": true
+      }
+    }
+  },
+  "response": {
+    "status": 401,
+    "body" : "Unauthorized"
+  }
+}
