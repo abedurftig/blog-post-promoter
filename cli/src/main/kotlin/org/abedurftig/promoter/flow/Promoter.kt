@@ -2,6 +2,8 @@ package org.abedurftig.promoter.flow
 
 import io.vavr.control.Try
 import org.abedurftig.promoter.clients.devto.DevToService
+import org.abedurftig.promoter.clients.git.GitClient
+import org.abedurftig.promoter.clients.git.GitClientException
 import org.abedurftig.promoter.files.BlogPostReader
 import org.abedurftig.promoter.files.BlogPostWriter
 import org.abedurftig.promoter.files.ChecksumBuilder
@@ -56,12 +58,19 @@ class Promoter(
         Log.log("More detail: $context")
 
         val statusMap = processBlogPosts(context, status)
-        val updatedStatus = PromoterStatus(statusMap)
-
-        statusService.writeStatus(updatedStatus)
+        if (statusMap.isNotEmpty()) {
+            val updatedStatus = PromoterStatus(statusMap)
+            statusService.writeStatus(updatedStatus)
+            Log.log("Updated status file.")
+        }
 
         val gitRepoPath = settings.targetDir + File.separator + ".git"
-        gitClient.commitNewAndChangedFiles(gitRepoPath)
+        try {
+            gitClient.commitNewAndChangedFiles(gitRepoPath)
+        } catch (exception: GitClientException) {
+            Log.log("Failed to sync with GitHub: ${exception.message}")
+        }
+        Log.log("Done")
     }
 
     private fun validateDevToToken() {
@@ -87,20 +96,25 @@ class Promoter(
     private fun processBlogPosts(context: Context, status: PromoterStatus): Map<String, StatusEntry> {
 
         val statusMap = mutableMapOf<String, StatusEntry>()
+        var relevantUpdateExists = false
 
         context.toBePublished.forEach { toBePublished ->
             val statusMapEntryPair = handleNewPost(toBePublished)
             statusMap[statusMapEntryPair.first] = statusMapEntryPair.second
+            relevantUpdateExists = true
         }
 
         context.toBeUpdated.forEach { toBeUpdated ->
             val statusMapEntryPair = handleUpdatedPost(toBeUpdated)
             statusMap[statusMapEntryPair.first] = statusMapEntryPair.second
+            relevantUpdateExists = true
         }
 
         context.unmodified.forEach { unmodified ->
             val fileName = unmodified.filePath.substringAfterLast(File.separator)
-            statusMap[fileName] = status.postStatusMap[getFileName(unmodified)] ?: error("")
+            if (relevantUpdateExists) {
+                statusMap[fileName] = status.postStatusMap[getFileName(unmodified)] ?: error("")
+            }
             Log.log("The blog post with title '${unmodified.title}' has not changed.")
         }
 

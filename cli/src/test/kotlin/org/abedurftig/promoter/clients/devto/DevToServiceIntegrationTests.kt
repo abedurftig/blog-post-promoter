@@ -1,8 +1,5 @@
-package org.abedurftig.promoter.clients
+package org.abedurftig.promoter.clients.devto
 
-import org.abedurftig.promoter.clients.devto.ClientException
-import org.abedurftig.promoter.clients.devto.DevToClient
-import org.abedurftig.promoter.clients.devto.DevToService
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
 

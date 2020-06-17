@@ -11,7 +11,7 @@ import org.abedurftig.promoter.files.BlogPostReader
 import org.abedurftig.promoter.files.BlogPostWriter
 import org.abedurftig.promoter.files.ChecksumBuilder
 import org.abedurftig.promoter.files.StatusService
-import org.abedurftig.promoter.flow.GitClient
+import org.abedurftig.promoter.clients.git.GitClient
 import org.abedurftig.promoter.flow.Log
 import org.abedurftig.promoter.flow.Promoter
 import org.abedurftig.promoter.flow.PromotionException
