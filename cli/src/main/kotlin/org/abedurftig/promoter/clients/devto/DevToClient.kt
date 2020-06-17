@@ -9,6 +9,8 @@ import org.http4k.core.Status
 
 interface DevToApi {
 
+    fun validateUserAuthentication(): Boolean
+
     fun createArticle(createArticleRequest: CreateArticleRequest): CreateArticleResponse
 
     fun updateArticle(id: Int, updateArticleRequest: UpdateArticleRequest): UpdateArticleResponse
@@ -24,6 +26,13 @@ class ClientException(message: String, private val status: Int) : Exception("$me
 class DevToClient(private val authKey: String) : DevToApi {
 
     val client = ApacheClient()
+
+    override fun validateUserAuthentication(): Boolean {
+        val request = Request(Method.GET, ApplicationProperties.devToUrl + "/api/users/me")
+            .header("api_key", authKey)
+        val response = client(request)
+        return response.status == Status.OK
+    }
 
     override fun createArticle(createArticleRequest: CreateArticleRequest): CreateArticleResponse {
 

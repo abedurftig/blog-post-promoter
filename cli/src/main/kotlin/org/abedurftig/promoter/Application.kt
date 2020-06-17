@@ -12,7 +12,9 @@ import org.abedurftig.promoter.files.BlogPostWriter
 import org.abedurftig.promoter.files.ChecksumBuilder
 import org.abedurftig.promoter.files.StatusService
 import org.abedurftig.promoter.flow.GitClient
+import org.abedurftig.promoter.flow.Log
 import org.abedurftig.promoter.flow.Promoter
+import org.abedurftig.promoter.flow.PromotionException
 import org.abedurftig.promoter.flow.Settings
 import org.abedurftig.promoter.markdown.MarkdownComposer
 
@@ -70,7 +72,7 @@ class ApplicationWrapper : CliktCommand(
         val devToService = DevToService(DevToClient(settings.devToken))
         val gitClient = GitClient(settings.githubToken)
 
-        Promoter(
+        val promoter = Promoter(
             blogPostReader,
             blogPostWriter,
             statusService,
@@ -78,7 +80,13 @@ class ApplicationWrapper : CliktCommand(
             devToService,
             markdownComposer,
             gitClient
-        ).execute(settings)
+        )
+
+        try {
+            promoter.execute(settings)
+        } catch (exception: PromotionException) {
+            Log.warn(exception.exceptionMessage)
+        }
     }
 }
 

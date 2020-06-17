@@ -9,4 +9,8 @@ object Log {
     fun log(message: String) {
         LOG.info(message)
     }
+
+    fun warn(message: String) {
+        LOG.warn(message)
+    }
 }

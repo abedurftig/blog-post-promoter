@@ -17,14 +17,17 @@ class Context(
     val toBePublished: Set<BlogPost>,
     val toBeUpdated: Set<BlogPost>,
     val unmodified: Set<BlogPost>,
-    val untracked: Set<BlogPost>
+    val untracked: Set<BlogPost>,
+    val skipped: Set<BlogPost>
 ) {
 
     override fun toString(): String {
-        return "Context - new=${toBePublished.size}, updated=${toBeUpdated.size}, " +
-            "unmodified=${unmodified.size}, untracked=${untracked.size}"
+        return "New=${toBePublished.size}, Updated=${toBeUpdated.size}, " +
+            "Unmodified=${unmodified.size}, Untracked=${untracked.size}, Skipped=${skipped.size}"
     }
 }
+
+class PromotionException(val exceptionMessage: String) : Exception(exceptionMessage)
 
 class Promoter(
     private val blogPostReader: BlogPostReader,
@@ -41,6 +44,8 @@ class Promoter(
         Log.log("Running with the following settings:")
         Log.log(settings.toString())
 
+        validateDevToToken()
+
         val contentPath = settings.targetDir + settings.contentDir
         val blogPosts = blogPostReader.readBlogPosts(contentPath)
         val status = statusService.readStatus()
@@ -48,9 +53,9 @@ class Promoter(
         Log.log("Found ${blogPosts.size} blog posts, the last status update was '${status.lastUpdate}'.")
 
         val context = buildContext(blogPosts, status, settings)
-        Log.log(context.toString())
+        Log.log("More detail: ${context.toString()}")
 
-        val statusMap = run(context, status)
+        val statusMap = processBlogPosts(context, status)
         val updatedStatus = PromoterStatus(statusMap)
 
         statusService.writeStatus(updatedStatus)
@@ -59,7 +64,27 @@ class Promoter(
         gitClient.commitNewAndChangedFiles(gitRepoPath)
     }
 
-    private fun run(context: Context, status: PromoterStatus): Map<String, StatusEntry> {
+    private fun validateDevToToken() {
+        if (!devToService.verifyToken()) {
+            throw PromotionException("The token provided for Dev.to seems invalid; please verify your input.")
+        }
+    }
+
+    private fun validateBlogPost(blogPost: BlogPost): String? {
+
+        if (!hasCanonicalUrl(blogPost)) {
+            return "The blog post with title ${blogPost.title}' is missing the 'canonical_url' attribute."
+        }
+        return null
+    }
+
+    private fun hasCanonicalUrl(blogPost: BlogPost): Boolean {
+        val canonicalUrl = blogPost.attributes
+            .firstOrNull { it.key == "canonical_url" }?.values?.firstOrNull()
+        return canonicalUrl != null && canonicalUrl.isNotBlank()
+    }
+
+    private fun processBlogPosts(context: Context, status: PromoterStatus): Map<String, StatusEntry> {
 
         val statusMap = mutableMapOf<String, StatusEntry>()
 
@@ -124,11 +149,18 @@ class Promoter(
         val toBeUpdated = mutableSetOf<BlogPost>()
         val unmodified = mutableSetOf<BlogPost>()
         val untracked = mutableSetOf<BlogPost>()
+        val skipped = mutableSetOf<BlogPost>()
 
         blogPosts.forEach { blogPost ->
 
             val currentChecksum = checksumBuilder.calculateCheckSumFromDist(blogPost.filePath)
             val statusEntry = status.postStatusMap[getFileName(blogPost)]
+
+            validateBlogPost(blogPost)?.let {
+                skipped.add(blogPost)
+                Log.warn(it)
+                return@forEach
+            }
 
             if (statusEntry == null) {
                 if (shouldBePublished(blogPost, settings.publishIf)) {
@@ -146,7 +178,7 @@ class Promoter(
                 }
             }
         }
-        return Context(toBePublished, toBeUpdated, unmodified, untracked)
+        return Context(toBePublished, toBeUpdated, unmodified, untracked, skipped)
     }
 
     private fun publishBlogPost(blogPost: BlogPost): Try<BlogPost> {
