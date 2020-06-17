@@ -1,6 +1,5 @@
 package org.abedurftig.promoter.clients.git
 
-import io.vavr.control.Try
 import org.abedurftig.promoter.flow.Log
 import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.api.errors.GitAPIException
