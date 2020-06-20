@@ -1,6 +1,7 @@
 package org.abedurftig.promoter.clients.devto
 
 import org.abedurftig.promoter.ApplicationProperties
+import org.abedurftig.promoter.flow.Log
 import org.abedurftig.promoter.model.JsonMapperFactory
 import org.http4k.client.ApacheClient
 import org.http4k.core.Method
@@ -42,6 +43,7 @@ class DevToClient(private val authKey: String) : DevToApi {
             .header("Content-Type", "application/json")
 
         val response = client(request)
+        Log.log(response.toString())
         if (response.status == Status.CREATED) {
             return JsonMapperFactory.getGson().fromJson(response.bodyString(), CreateArticleResponse::class.java)
         }
