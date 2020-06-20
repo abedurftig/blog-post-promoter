@@ -42,9 +42,7 @@ class DevToClient(private val authKey: String) : DevToApi {
             .header("api_key", authKey)
             .header("Content-Type", "application/json")
 
-        Log.log(request.toString())
         val response = client(request)
-        Log.log(response.toString())
         if (response.status == Status.CREATED) {
             return JsonMapperFactory.getGson().fromJson(response.bodyString(), CreateArticleResponse::class.java)
         }
