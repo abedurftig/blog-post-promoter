@@ -29,7 +29,7 @@ class DevToClient(private val authKey: String) : DevToApi {
     val client = ApacheClient()
 
     override fun validateUserAuthentication(): Boolean {
-        val request = Request(Method.GET, ApplicationProperties.devToUrl + "/api/users/me")
+        val request = Request(Method.GET, ApplicationProperties.devToUrl + "api/users/me")
             .header("api_key", authKey)
         val response = client(request)
         return response.status == Status.OK
@@ -37,7 +37,7 @@ class DevToClient(private val authKey: String) : DevToApi {
 
     override fun createArticle(createArticleRequest: CreateArticleRequest): CreateArticleResponse {
 
-        val request = Request(Method.POST, ApplicationProperties.devToUrl + "/api/articles")
+        val request = Request(Method.POST, ApplicationProperties.devToUrl + "api/articles")
             .body(JsonMapperFactory.getGson().toJson(createArticleRequest))
             .header("api_key", authKey)
             .header("Content-Type", "application/json")
@@ -52,7 +52,7 @@ class DevToClient(private val authKey: String) : DevToApi {
 
     override fun updateArticle(id: Int, updateArticleRequest: UpdateArticleRequest): UpdateArticleResponse {
 
-        val request = Request(Method.PUT, ApplicationProperties.devToUrl + "/api/articles/$id")
+        val request = Request(Method.PUT, ApplicationProperties.devToUrl + "api/articles/$id")
             .body(JsonMapperFactory.getGson().toJson(updateArticleRequest))
             .header("api_key", authKey)
             .header("Content-Type", "application/json")
