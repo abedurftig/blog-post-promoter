@@ -1,7 +1,13 @@
 {
   "request": {
     "method": "POST",
-    "url": "/api/articles"
+    "url": "/api/articles",
+    "headers": {
+      "api_key": {
+        "equalTo": "correct_key",
+        "caseInsensitive": true
+      }
+    }
   },
   "response": {
     "status": 201,

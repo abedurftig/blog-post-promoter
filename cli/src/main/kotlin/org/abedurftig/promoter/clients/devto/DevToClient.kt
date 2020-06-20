@@ -42,6 +42,7 @@ class DevToClient(private val authKey: String) : DevToApi {
             .header("api_key", authKey)
             .header("Content-Type", "application/json")
 
+        Log.log(request.toString())
         val response = client(request)
         Log.log(response.toString())
         if (response.status == Status.CREATED) {
@@ -58,7 +59,7 @@ class DevToClient(private val authKey: String) : DevToApi {
             .header("Content-Type", "application/json")
 
         val response = client(request)
-        if (response.status == Status.CREATED) {
+        if (response.status == Status.OK) {
             return JsonMapperFactory.getGson().fromJson(response.bodyString(), UpdateArticleResponse::class.java)
         }
         throw ClientException(response.bodyString(), response.status.code)

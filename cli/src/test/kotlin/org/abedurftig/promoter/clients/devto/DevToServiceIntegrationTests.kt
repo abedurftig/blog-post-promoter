@@ -8,7 +8,7 @@ class DevToServiceIntegrationTests {
     @Test
     fun `should create an article`() {
 
-        val service = DevToService(DevToClient(""))
+        val service = DevToService(DevToClient("correct_key"))
         val response = service.createArticle("", "")
 
         Assertions.assertThat(response.id).isEqualTo(150589)
