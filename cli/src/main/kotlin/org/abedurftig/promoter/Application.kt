@@ -20,7 +20,7 @@ import org.abedurftig.promoter.markdown.MarkdownComposer
 
 class ApplicationWrapper : CliktCommand(
     name = "BlogPostPromoter",
-    printHelpOnEmptyArgs = true,
+    printHelpOnEmptyArgs = false,
     help = """
         Syndicate your blog posts to Dev.to
         
@@ -37,29 +37,29 @@ class ApplicationWrapper : CliktCommand(
 
     private val projectDir: String by option(
         "--project-dir", "-p",
-        help = "Path to project folder (containing the Git repository)",
-        envvar = "PROJECT_DIR").required()
+        help = "Path to project folder (containing the Git repository)")
+        .required()
 
     private val articlesDir: String by option(
         "--articles-dir", "-a",
-        help = "Path to folder contains the blog posts in project",
-        envvar = "ARTICLES_DIR").required()
+        help = "Path to folder contains the blog posts in project")
+        .required()
 
     private val publishIf: String by option(
         "--publish-if", "-if",
         help = "The name of front matter attribute which needs to be " +
-            "true before publishing the post; the default is 'published'",
-        envvar = "PUBLISH_IF").default("published")
+            "true before publishing the post; the default is 'published'")
+        .default("published")
 
     private val devToken: String by option(
         "--dev-token", "-dt",
-        help = "API token for Dev.to",
-        envvar = "DEV_TOKEN").required()
+        help = "API token for Dev.to")
+        .required()
 
     private val githubToken: String by option(
         "--github-token", "-gt",
-        help = "API token for GitHub",
-        envvar = "GITHUB_TOKEN").required()
+        help = "API token for GitHub")
+        .required()
 
     override fun run() {
 
