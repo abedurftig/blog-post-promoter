@@ -1,7 +1,6 @@
 package org.abedurftig.promoter.clients.devto
 
 import org.abedurftig.promoter.ApplicationProperties
-import org.abedurftig.promoter.flow.Log
 import org.abedurftig.promoter.model.JsonMapperFactory
 import org.http4k.client.ApacheClient
 import org.http4k.core.Method
